@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Cricket Game in JS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>
+        <marquee behavior="scroll" direction="left" scrollamount="8">Bat Ball Stump Game <img src="OIP.jpeg" alt="" height="50px">  </marquee>
+      </h1>
+      
+
+    <!-- Game buttons -->
+    <button class="aq-button" onclick="playGame('bat')">
+        <img src="th.jpeg" class="aq-bat" alt="bat">
+    </button>
+
+    <button class="aq-button" onclick="playGame('ball')">
+        <img src="th (2).jpeg" class="aq-bat" alt="ball">
+    </button>
+
+    <button class="aq-button" onclick="playGame('stump')">
+        <img src="bro.jpeg" class="aq-bat" alt="stump">
+    </button>
+
+    <!-- Result and score display -->
+    <h3 id="user-move"></h3>
+    <h3 id="computer-move"></h3>
+    <h3 id="result"></h3>
+    <h3 id="score"></h3>
+
+    <!-- Reset button -->
+    <button class="reset" onclick="resetGame()">
+        <img class="buttom1" src="reset.jpeg" alt="reset">
+    </button>
+
+    <script>
+        let scoreStr = localStorage.getItem('score');
+        let score;
+
+        resetscore(scoreStr);
+
+        function resetscore(scoreStr) {
+            score = scoreStr ? JSON.parse(scoreStr) : {
+                win: 0,
+                lost: 0,
+                tie: 0
+            };
+            score.displayscore = function() {
+                return `Win: ${this.win}, Lost: ${this.lost}, Tie: ${this.tie}`;
+            }
+        }
+
+        // Function to handle game logic and display results
+        function playGame(userMove) {
+            let computerMove = generateComputerChoice();
+            let resultMsg = getResult(userMove, computerMove);
+            showResult(userMove, computerMove, resultMsg);
+
+            // Change score color randomly
+            let scoreElement = document.querySelector('#score');
+            scoreElement.style.color = getRandomColor();
+        }
+
+        function generateComputerChoice() {
+            let randomNumber = Math.random() * 3;
+            if (randomNumber <= 1) {
+                return 'bat';
+            } else if (randomNumber <= 2) {
+                return 'ball';
+            } else {
+                return 'stump';
+            }
+        }
+
+        function getResult(userMove, computerMove) {
+            if (userMove === 'bat') {
+                if (computerMove === 'ball') {
+                    score.win++;
+                    return 'User won';
+                } else if (computerMove === 'bat') {
+                    score.tie++;
+                    return 'It\'s a tie';
+                } else if (computerMove === 'stump') {
+                    score.lost++;
+                    return 'Computer has won';
+                }
+            } else if (userMove === 'ball') {
+                if (computerMove === 'ball') {
+                    score.tie++;
+                    return 'It\'s a tie';
+                } else if (computerMove === 'bat') {
+                    score.lost++;
+                    return 'Computer has won';
+                } else if (computerMove === 'stump') {
+                    score.win++;
+                    return 'User has won';
+                }
+            } else if (userMove === 'stump') {
+                if (computerMove === 'ball') {
+                    score.lost++;
+                    return 'Computer has won';
+                } else if (computerMove === 'bat') {
+                    score.win++;
+                    return 'User won';
+                } else if (computerMove === 'stump') {
+                    score.tie++;
+                    return 'It\'s a tie';
+                }
+            }
+        }
+
+        function showResult(userMove, computerMove, result) {
+            localStorage.setItem('score', JSON.stringify(score));
+            
+            document.querySelector('#user-move').innerText = `You chose ${userMove}`;
+            document.querySelector('#computer-move').innerText = `Computer chose ${computerMove}`;
+            document.querySelector('#result').innerText = result;
+            document.querySelector('#score').innerText = score.displayscore();
+        }
+
+        // Reset the game and clear the score
+        function resetGame() {
+            localStorage.clear();
+            resetscore();
+            document.querySelector('#score').innerText = score.displayscore();
+            document.querySelector('#score').style.color = 'black'; // Reset color
+        }
+
+        // Function to get a random color
+        function getRandomColor() {
+            let letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Initialize score display on page load
+        document.querySelector('#score').innerText = score.displayscore();
+    </script>
+</body>
+</html>
